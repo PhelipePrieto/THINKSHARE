@@ -1,5 +1,10 @@
 const express = require("express")
-const { saveNote } = require("./db")
+const {
+  saveNote,
+  getNote,
+  deleteExpiredNotes,
+  markNoteAsOpened,
+} = require("./db")
 const app = express()
 const port = 3000
 
@@ -36,6 +41,19 @@ app.post("/notes", async (req, res) => {
 
 app.get("/share/id", async (req, res) => {
   await deleteExpiredNotes()
+
+  const { id } = req.params
+  const note = await getNote(id)
+
+  if (!note) {
+    return res.send("<span class='error'>Nota não encontrada!</span>")
+  }
+
+  if (!note.opened_at) {
+    await markNoteAsOpened(id)
+  }
+
+  res.send(note.content)
 })
 
 app.listen(port, () => {

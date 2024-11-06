@@ -96,4 +96,7 @@ const deleteExpiredNotes = () => {
 
 module.exports = {
   saveNote,
+  getNote,
+  markNoteAsOpened,
+  deleteExpiredNotes,
 }
