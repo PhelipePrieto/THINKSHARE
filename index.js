@@ -6,7 +6,6 @@ const {
   markNoteAsOpened,
 } = require("./db")
 const app = express()
-const port = 3000
 
 app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true }))
@@ -23,30 +22,26 @@ app.post("/notes", async (req, res) => {
   const { content } = req.body
 
   if (!content) {
-    return res.send("<span>Erro inesperado!</span>")
+    return res.send('<span class="error">Erro inesperado!</span>')
   }
 
   const id = crypto.randomUUID()
-
   await saveNote(id, content)
-
   res.send(`
-      <p>
-        Compartilhe sua nota através do link
-        <br />
-        <span>${req.headers.origin}/note/${id}</span>
-      </p>
-  `)
+    <p>Compartilhe sua nota através do link
+      <br />
+      <span>${req.headers.origin}/note/${id}</span>
+    </p>
+    `)
 })
 
-app.get("/share/id", async (req, res) => {
+app.get("/share/:id", async (req, res) => {
   await deleteExpiredNotes()
 
   const { id } = req.params
   const note = await getNote(id)
-
   if (!note) {
-    return res.send("<span class='error'>Nota não encontrada!</span>")
+    return res.send('<span class="error">Esta mensagem não existe mais!</span>')
   }
 
   if (!note.opened_at) {
@@ -56,6 +51,7 @@ app.get("/share/id", async (req, res) => {
   res.send(note.content)
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+const PORT = 3000
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
 })
